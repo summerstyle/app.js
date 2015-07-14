@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>interface.js</title>
+	<link href="main.css" rel="stylesheet" />
+	<link href="../app.css" rel="stylesheet" />
+	<script src="../App.js"></script>
+	<meta charset="UTF-8" />
+</head>
+<body>
+<noscript>
+	<div id="noscript">
+		Please, enable javascript in your browser
+	</div>
+</noscript>
+  
+<div id="container">
+	<div class="txt">
+		<header>
+			<h1>
+				<a href="#">App.js</a> &mdash; современный javascript-фреймворк для создания
+				десктопоподобных приложений.
+			</h1>
+			<p>
+				Включает в себя классы для создания окон, в том числе диалоговых,
+				меню.
+			</p>
+			<nav>
+				<ul class="links">
+					<li>
+						<a href="#app_window">Window</a>
+					</li>
+					<li>
+						<a href="#app_menu">Menu</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<h2>
+			Компоненты
+		</h2>
+		<ul>
+			<li id="app_window">
+				<h3>Конструктор <span class="code code_inline">Interface.Window</span></h3>
+				<p>
+					Оборачивает содержимое блока в окно, подключает для него js-модуль.
+				</p>
+				<div class="code">
+					<div class="line">
+						var code = new Interface.Window({
+					</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;content_el : utils.dom.id('code'),</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;overlay : true,</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;movable : true,</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;js_module : function(self) {</div>
+					<div class="line">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return {
+					</div>
+					<div class="line">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print: function() {
+					</div>
+					<div class="line">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.el.innerHTML = selected_keys.generate_config();
+					</div>
+					<div class="line">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.show();
+					</div>
+					<div class="line">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+					</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};</div>
+					<div class="line">&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+					<div class="line">
+						});
+					</div>
+				</div>
+				<p>
+					<span class="pseudo_link" id="window_example_link">Открыть пример</span>
+					<div id="window_example">
+						La-la-la
+					</div>
+					<script>
+						window.onload = function() {
+							var link = document.getElementById('window_example_link');
+							var win = new Interface.Window({
+								content_el : document.getElementById('window_example'),
+								overlay : true
+							});
+							
+							link.onclick = function() {
+								win.show();
+							}
+						};
+					</script>
+				</p>
+				<h4>Параметры:</h4>
+				<ul>
+					<li>
+						content_el* : dom-элемент для вставки в окно,
+					</li>
+					<li>
+						overlay : добавить overlay,
+					</li>
+					<li>
+						movable: можно перетаскивать окно,
+					</li>
+					<li>
+						closable: можно закрывать,
+					</li>
+					<li>
+						layout: стиль окна,
+					</li>
+					<li>
+						js_module: функция, которая возвращает объект с методами,
+						которые будут подмешаны в окно.    
+					</li>
+				</ul>
+				<h4>Методы:</h4>
+				<ul>
+					<li>show &mdash; показывает окно,</li>
+					<li>hide &mdash; скрывает окно.</li>
+				</ul>
+			</li>
+			<li id="app_menu">
+				<h3>Меню</h3>
+				<p>Создает многоуровневое меню (до 4-х уровней),
+				каждая ссылка - действие.</p>
+			</li>
+		</ul>
+	</div>
+</div>
+	
+<script src="App.js"></script>
+</body>
+</html>
