@@ -45,7 +45,9 @@
     display: block;
 }
 
-
+.hidden {
+    display: none;
+}
 
 .menu {
     float: left;
@@ -60,13 +62,14 @@
             border-bottom: 1px solid #BCBCBC;
         }
         
-        .menu__item a:link, .menu__item a:visited {
+        .menu__item-name {
             padding: 7px 10px;
             display: block;
             color: #777;
             text-shadow: rgba(255, 255, 255, 0.4) 0 -1px 0;
+            cursor: pointer;
         }
-        .menu__item a:hover, .menu__item a:active, .menu__item_selected a {
+        .menu__item-name a:hover {
             color: #000;
         }
     
@@ -94,7 +97,7 @@
             max-width: 250px;
             line-height: 1.2;
         }
-        .menu_level2 .menu__item a:hover {
+        .menu_level2 .menu__item-name:hover {
             background: #32c832;
             color: #FFF;
             text-shadow: none;
@@ -184,8 +187,6 @@
     padding: 70px 20px 0;
 }
 
-
-
 .overlay {
     position: fixed;
     top: 0;
@@ -237,42 +238,26 @@
         right: 10px;
         height: 20px;
         width: 20px;
-        line-height: 18px;
+        line-height: 16px;
         text-align: center;
         cursor: pointer;
     }
         .window__close-button:before {
-            content: 'x';
+            content: '✕';
+            font-family: sans-serif;
+            font-size: 10px;
         }
         .window__close-button:hover {
             background: #32c832;
             color: #FFF;
         }
-    .window__content {
-        
-    }
-    
-    
+       
 .app-example {
     box-sizing: border-box;
     border: 3px dashed #EEE;
     padding: 20px;
     color: #AAA;
 }
-
-
-
-::selection {
-    background: #EEE;
-    color: #000;
-}
-::-moz-selection {
-    background: #EEE;
-    color: #000;
-}
-
-
-
 
 .form h5 {
     margin-bottom: 20px;
@@ -287,3 +272,11 @@
     margin-bottom: 5px;
 }
 
+::selection {
+    background: #EEE;
+    color: #000;
+}
+::-moz-selection {
+    background: #EEE;
+    color: #000;
+}

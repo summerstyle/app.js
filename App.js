@@ -1,29 +1,18 @@
 /*
  * App.js
- * http://github.com/summerstyle/jsonTreeViewer
+ * http://github.com/summerstyle/app.js
  *
  * Copyright 2015 Vera Lobacheva (summerstyle.ru)
  * Released under the GPL3 (GPL3.txt)
- *
- * Sun 27 2014 20:15:00 GMT+0400
  */
 
 'use strict';
 
-var Interface = (function() {
-    self = {};
-    
-    /* Events */
-    var events = (function() {
-        var list = {};
-        
-        return {
-            fire : function() {
-                    
-            }    
-        };
-    })();
-    
+/**
+ * The application
+ * @returns {Object} The application interface with Menu and Window constructors
+ */
+var App = (function() {
     /* Utilities */
     var utils = {
         dom : {
@@ -48,6 +37,37 @@ var Interface = (function() {
                 
                 return this;
             },
+            matches : (function() {
+				var el = document.createElement('div'),
+					matches = el.matches ||
+                              el.mozMatchesSelector ||
+                              el.webkitMatchesSelector ||
+                              el.oMatchesSelector ||
+                              el.msMatchesSelector;
+				
+				return function(selector, el) {
+					if (!matches) {
+						return false;
+					}
+					
+					return matches.call(el, selector);
+				}
+			})(),
+            closest : function(el, selector) {
+				var parent = el,
+					result = false;
+				
+				while (parent && parent !== document) {
+					if (this.matches(selector, parent)) {
+						result = parent;
+						break;
+					}
+					
+					parent = parent.parentNode;
+				}
+				
+				return result;
+			}
         },
         extend : function(obj, options) {
             var target = {};
@@ -86,64 +106,108 @@ var Interface = (function() {
         })(),
     };
     
-    var Menu = function(items, settings) {
-        /*
-            var settings = {
-                class: "navi",
-                id: "navi"
-            },
+    /**
+     * Creates a new menu
+     * @constructor
+     * @param {HTMLElement} el     - The root element of menu
+     * @param {object}      config - The dict with name-action mapping
+     */
+    var Menu = function(el, config) {
+        el.addEventListener('click', function(e) {
+            var menu_item = utils.dom.closest(e.target, '.menu__item'),
+                action = menu_item ? menu_item.dataset['action'] : null;
             
-            items = {
-                    
-            };
-        */
-        var template = '<div id="nav">\
-            \
-        </div>';
+            if (action && action in config) {
+                config[action]();    
+            }
+        }, false);    
+    };
+    
+    
+    /**
+     * Creates a new app window
+     * @constructor
+     * @param {object} config - The params of this window
+     */
+    function Window(config) {
+        var defaults = {
+            closable: true,
+            overlay: true,
+            layout: 'default',
+            content_el: null,
+            js_module: null
+        };
         
-        root.apendChild();
-    };
-    
-    var MenuItem = function(config) {
-        /*
-        var config = {
-            href: '',
-            position: 'left',
-            action: function() {
-                Editor.open()
-            },
-            icon: 'lala.png',
-            text: 'File'
+        var params = utils.extend(defaults, config);
+        
+        this.content_el = params.content_el;
+        
+        var window_el = document.createElement('div'),
+            content_wrapper = document.createElement('div');
+            
+        window_el.className = 'window';
+        content_wrapper.className = 'window__content';
+        
+        if (params.overlay) {
+            var overlay = Window.create_overlay();
         }
-        */
-    };
-    
-    self.menu;
-    self.panel;
-    self.modal_dialogs;
-    
-    var menu_config = {
-        'help' : function() {
-            layers.push(a);
-        },
-        'clear': function() {
-            layers.clear();    
+        
+        if (params.content_el.dataset['header']) {
+            var header = document.createElement('h4');
+            header.className = 'window__header';
+            header.innerHTML = params.content_el.dataset['header'];
+            window_el.appendChild(header);
         }
-    };
-    
-    
-    var menu = document.querySelectorAll('.menu__item');
-    
-    for (var i = 0, c = menu.length; i < c; i++) {
-        var action = menu[i].dataset['action'];
-        if (action && typeof menu_config[action] === 'function') {
-            menu[i].addEventListener('click', menu_config[action], false);
+        
+        window_el.appendChild(content_wrapper);
+        document.body.appendChild(window_el);
+        
+        // Add content 
+        if (params.content_el) {
+            content_wrapper.appendChild(params.content_el);
         }
+
+        // Add close button + events
+        if (params.closable) {
+            var close_button = document.createElement('div');
+            close_button.className = 'window__close-button';
+            window_el.appendChild(close_button);
+            
+            close_button.addEventListener('click', hide, false);
+            overlay.addEventListener('click', hide, false);
+        }
+        
+        // JS module
+        if (typeof params.js_module === 'function') {
+            var result = params.js_module.call(this, this);
+            utils.mixin(this, result);
+        }
+ 
+        function show() {
+            utils.dom.show(window_el);
+            
+            if (overlay) {
+                utils.dom.show(overlay);
+            }
+            
+            Window.layers.push(this);
+        }
+        
+        function hide() {
+            utils.dom.hide(window_el);
+            
+            if (overlay) {
+                utils.dom.hide(overlay);
+            }
+            
+            Window.layers.pop(this);
+        }
+        
+        this.show = show;
+        this.hide = hide;
     }
     
-    
-    
-    var layers = (function() {
+    Window.layers = (function() {
         var arr = [],
             current = 0;
         
@@ -155,7 +219,7 @@ var Interface = (function() {
             pop : function() {
                 arr.pop();
             },
-            clear: function() {
+            clear : function() {
                 while(arr.length) {
                     this.pop();
                 }
@@ -163,8 +227,15 @@ var Interface = (function() {
         };
     })();
     
-    function create_overlay() {
+    /**
+     * @function create_overlay
+     * @memberof Window
+     * @static
+     * @returns {HTMLElement} - A DOM-element of new overlay
+     */
+    Window.create_overlay = function() {
         var overlay = document.createElement('div');
+        
         overlay.className = 'overlay';
         utils.dom.hide(overlay);
         document.body.appendChild(overlay);
@@ -172,82 +243,6 @@ var Interface = (function() {
         return overlay;
     }
     
-    /**
-     *
-     *
-     *
-     */
-    function Window(config) {
-        var defaults = {
-            movable: false,
-            closable: true,
-            overlay: true,
-            layout: 'default',
-            content_el: null,
-            js_module: null
-        };
-        
-        var params = utils.extend(defaults, config);
-        console.log(params);
-        
-        var el = document.createElement('div'),
-            close_button = document.createElement('div'),
-            content_wrapper = document.createElement('div'),
-            overlay = params.overlay ? create_overlay() : null;
-        
-        this.el = params.content_el;
-        
-        if (params.content_el.dataset['header']) {
-            var header = document.createElement('h5');
-            header.className = 'window__header';
-            header.innerHTML = params.content_el.dataset['header'];
-            el.appendChild(header);
-        }
-        
-        el.className = 'window';
-        close_button.className = 'window__close-button';
-        content_wrapper.className = 'window__content';
-        
-        if (params.movable) {
-            el.classList.add('window_movable');
-        }
-        
-        el.appendChild(close_button);
-        el.appendChild(content_wrapper);
-        content_wrapper.appendChild(params.content_el);
-        
-        document.body.appendChild(el);
-        
-        if (params.closable) {
-            close_button.addEventListener('click', hide, false);
-            overlay.addEventListener('click', hide, false);
-        }
-            
-        
-        if (typeof params.js_module === 'function') {
-            var result = params.js_module.call(this, this);
-            utils.mixin(this, result);
-        }
- 
-        function show() {
-            utils.dom.show(el);
-            if (overlay) {
-                utils.dom.show(overlay);
-            }
-            layers.push(this);
-        }
-        
-        function hide() {
-            utils.dom.hide(el);
-            if (overlay) {
-                utils.dom.hide(overlay);
-            }
-            layers.pop(this);
-        }
-        
-        this.show = show;
-        this.hide = hide;
-    }
     
     return {
         utils : utils,
