@@ -97,6 +97,15 @@ var App = (function() {
                 func(arr[i], i);
             };
         },
+        inherits : (function() {
+            var F = function() {};
+            
+            return function(Child, Parent) {
+                F.prototype = Parent.prototype;
+                Child.prototype = new F();
+                Child.prototype.constructor = Child;
+            }
+        })(),
         debug : (function() {
             var output = document.getElementById('debug');
             
@@ -139,6 +148,7 @@ var App = (function() {
         };
         
         var params = utils.extend(defaults, config);
+        var MIN_Z_INDEX = 10;
         
         this.content_el = params.content_el;
         
@@ -176,12 +186,6 @@ var App = (function() {
             close_button.addEventListener('click', hide, false);
             overlay.addEventListener('click', hide, false);
         }
-        
-        // JS module
-        if (typeof params.js_module === 'function') {
-            var result = params.js_module.call(this, this);
-            utils.mixin(this, result);
-        }
  
         function show() {
             utils.dom.show(window_el);
@@ -205,6 +209,18 @@ var App = (function() {
         
         this.show = show;
         this.hide = hide;
+        this.set_layer = function(n) {
+            utils.dom.css(window_el, 'zIndex', MIN_Z_INDEX + n * 2 + 1);
+            if (params.overlay) {
+                utils.dom.css(overlay, 'zIndex', MIN_Z_INDEX + n * 2);
+            }
+        };
+        
+        // JS module
+        if (typeof params.js_module === 'function') {
+            var result = params.js_module.call(this, this);
+            utils.mixin(this, result);
+        }
     }
     
     Window.layers = (function() {
@@ -212,12 +228,18 @@ var App = (function() {
             current = 0;
         
         return {
-            push : function(layer) {
-                current++;
-                arr.push(layer);
+            push : function(win) {
+                win.set_layer(++current);
+                arr.push(win);
             },
-            pop : function() {
-                arr.pop();
+            pop : function(win) {
+                if (win) {
+                    arr.splice(arr.indexOf(win), 1);
+                } else {
+                    arr.pop();
+                }
+                
+                current--;
             },
             clear : function() {
                 while(arr.length) {

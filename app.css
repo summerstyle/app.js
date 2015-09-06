@@ -271,6 +271,13 @@
 .form .checkboxes > li {
     margin-bottom: 5px;
 }
+.form textarea {
+    width: 100%;
+    display: inline-block;
+    border-radius: 3px;
+    border: 1px solid #EEE;
+    height: 70px;
+}
 
 ::selection {
     background: #EEE;
