@@ -67,7 +67,61 @@ var App = (function() {
 				}
 				
 				return result;
-			}
+			},
+            addClass : function(node, str) {
+                // node.className.baseVal for SVG-elements
+                // or
+                // node.className for HTML-elements
+                var is_svg = node.className.baseVal !== undefined ? true : false,
+                    arr = is_svg ? node.className.baseVal.split(' ') : node.className.split(' '),
+                    isset = false;
+                
+                utils.foreach(arr, function(x) {
+                    if(x === str) {
+                        isset = true;
+                    }
+                });
+                
+                if (!isset) {
+                    arr.push(str);
+                    is_svg ? node.className.baseVal = arr.join(' ') : node.className = arr.join(' ');
+                }
+                
+                return this;
+            },
+            removeClass : function(node, str) {
+                var is_svg = node.className.baseVal !== undefined ? true : false,
+                    arr = is_svg ? node.className.baseVal.split(' ') : node.className.split(' '),
+                    isset = false;
+                
+                utils.foreach(arr, function(x, i) {
+                    if(x === str) {
+                        isset = true;
+                        arr.splice(i--, 1);
+                    }
+                });
+                
+                if (isset) {
+                    is_svg ? node.className.baseVal = arr.join(' ') : node.className = arr.join(' ');
+                }
+                
+                return this;
+            },
+            hasClass : function(node, str) {
+                var is_svg = node.className.baseVal !== undefined ? true : false,
+                    arr = is_svg ? node.className.baseVal.split(' ') : node.className.split(' '),
+                    isset = false;
+                    
+                utils.foreach(arr, function(x) {
+                    if(x === str) {
+                        isset = true;
+                    }
+                });
+                
+                return isset;
+            }
+            
+            
         },
         extend : function(obj, options) {
             var target = {};
@@ -266,9 +320,44 @@ var App = (function() {
     }
     
     
+    /**
+     * Creates a new toolbox
+     * @constructor
+     * @param {HTMLElement} el     - The root element of menu
+     * @param {object}      config - The dict with name-action mapping
+     */
+    var Toolbox = function(el, config) {
+        var all = el.getElementsByTagName('li');
+        
+        function deselectAll() {
+			utils.foreach(all, function(x) {
+				utils.dom.removeClass(x, 'selected');
+			});
+		}
+		
+		function selectOne(button) {
+			deselectAll();
+			utils.dom.addClass(button, 'selected');
+		}
+        
+        el.addEventListener('click', function(e) {
+            var toolbox_item = utils.dom.closest(e.target, '.toolbox__item'),
+                action = toolbox_item ? toolbox_item.dataset['action'] : null;
+            
+            if (action && action in config) {
+                config[action]();
+                
+                deselectAll();
+                selectOne(toolbox_item);
+            }
+        }, false);    
+    };
+    
+    
     return {
         utils : utils,
         Menu : Menu,
-        Window : Window
+        Window : Window,
+        Toolbox : Toolbox
     };
 })();
