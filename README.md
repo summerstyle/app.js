@@ -2,9 +2,9 @@
 
 A simple javascript-framework for building desktop-like applications.
 
-[http://github.com/summerstyle/app.js] (http://github.com/summerstyle/app.js)
+[http://github.com/summerstyle/app.js](http://github.com/summerstyle/app.js)
 
-Released under the GPL3 (GPL3.txt)
+Released under the MIT License
 
 ## Components
 

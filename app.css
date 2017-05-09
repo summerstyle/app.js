@@ -320,6 +320,9 @@
 .form h5 {
     margin-bottom: 20px;
 }
+.form p {
+    margin-bottom: 10px;
+}
 .form section {
     margin-bottom: 20px;
 }
@@ -333,9 +336,33 @@
     width: 100%;
     display: inline-block;
     border-radius: 3px;
-    border: 1px solid #EEE;
+    padding: 2px 7px;
+    border: 1px solid #E1E1E1;
     height: 70px;
+    box-sizing: border-box;
 }
+.form input[type=text] {
+    width: 100%;
+    display: inline-block;
+    border-radius: 3px;
+    padding: 2px 7px;
+    border: 1px solid #E1E1E1;
+    box-sizing: border-box;
+}
+.form button {
+    border: 0;
+    background: #E1E1E1;
+    color: #555;
+    box-shadow: 0 0 1px #eee inset;
+    padding: 5px 20px;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    border-radius: 3px;
+    cursor: pointer;
+}
+    .form button:hover {
+        background: #32c832;
+        color: #FFF;
+    }
 
 ::selection {
     background: #EEE;
